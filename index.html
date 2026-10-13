@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOTAK MISTERI SEJARAH TINGKATAN 3</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter & Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- MediaPipe Hands CDN with fallback protection -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous" onerror="window.mediaPipeFailed=true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous" onerror="window.mediaPipeFailed=true"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            touch-action: manipulation;
+        }
+        .mystery-box {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+        }
+        .mystery-box:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(234, 179, 8, 0.9); }
+        }
+        .pulse-box {
+            animation: pulseGlow 1.5s infinite;
+        }
+        /* Custom scrollbar for review screen */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 min-h-screen text-slate-100 flex flex-col justify-between selection:bg-amber-400 selection:text-slate-900">
+
+    <!-- Header / Navbar -->
+    <header class="w-full py-4 px-6 bg-slate-950/40 backdrop-blur-md border-b border-purple-500/20 flex justify-between items-center z-20">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                <i class="fa-solid fa-box-open text-slate-950 text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg md:text-xl tracking-wide bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent">KOTAK MISTERI SEJARAH TINGKATAN 3</h1>
+                <p class="text-xs text-purple-300 font-medium">Ulang Kaji Bab 1–8 Interaktif</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button id="soundToggleBtn" onclick="toggleSound()" class="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-500/30 flex items-center justify-center hover:bg-purple-800/60 transition text-amber-300 shadow-md" title="Tutup/Buka Bunyi">
+                <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+            </button>
+            <button id="cameraToggleHeaderBtn" onclick="toggleCameraModal()" class="hidden md:flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-purple-950/60 border border-purple-500/30 hover:bg-purple-800/60 transition text-purple-200 text-xs font-semibold shadow-md">
+                <i class="fa-solid fa-video text-amber-400"></i>
+                <span id="camHeaderStatus">Kamera Tangan</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col items-center justify-center p-4 md:p-6 max-w-5xl mx-auto w-full relative">
+
+        <!-- 1. SKRIN PERMULAAN -->
+        <div id="startScreen" class="w-full flex flex-col items-center text-center space-y-6 my-auto">
+            <div class="relative">
+                <div class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-amber-500 via-purple-600 to-indigo-600 opacity-75 blur-lg animate-pulse"></div>
+                <div class="relative bg-slate-900/90 border border-purple-500/30 p-8 md:p-10 rounded-3xl shadow-2xl max-w-2xl w-full backdrop-blur-xl flex flex-col items-center">
+                    <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center shadow-xl shadow-amber-500/40 mb-6 animate-float">
+                        <i class="fa-solid fa-gift text-slate-950 text-4xl"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-4xl font-extrabold tracking-tight text-white mb-2">KOTAK MISTERI SEJARAH TINGKATAN 3</h2>
+                    <p class="text-amber-400 font-semibold text-sm md:text-base mb-6">Ulang Kaji Bab 1 – Bab 8</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-8">
+                        <div class="bg-purple-950/50 border border-purple-500/20 p-4 rounded-2xl flex flex-col items-center">
+                            <i class="fa-solid fa-list-check text-amber-400 text-xl mb-2"></i>
+                            <span class="text-xs text-purple-300">Jumlah Soalan</span>
+                            <span class="text-lg font-bold text-white">20 Soalan</span>
+                        </div>
+                        <div class="bg-purple-950/50 border border-purple-500/20 p-4 rounded-2xl flex flex-col items-center">
+                            <i class="fa-solid fa-stopwatch text-amber-400 text-xl mb-2"></i>
+                            <span class="text-xs text-purple-300">Masa Menjawab</span>
+                            <span class="text-lg font-bold text-white">10 Saat / Soalan</span>
+                        </div>
+                        <div class="bg-purple-950/50 border border-purple-500/20 p-4 rounded-2xl flex flex-col items-center">
+                            <i class="fa-solid fa-star text-amber-400 text-xl mb-2"></i>
+                            <span class="text-xs text-purple-300">Markah Maksimum</span>
+                            <span class="text-lg font-bold text-white">2,000 Markah</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                        <button onclick="startGame(true)" class="flex-1 py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold text-base shadow-xl shadow-amber-500/20 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-video text-lg"></i>
+                            <span>AKTIFKAN KAMERA & MULA</span>
+                        </button>
+                        <button onclick="startGame(false)" class="flex-1 py-4 px-6 rounded-2xl bg-purple-700 hover:bg-purple-600 text-white font-extrabold text-base shadow-xl shadow-purple-900/40 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2 border border-purple-400/30">
+                            <i class="fa-solid fa-play text-lg"></i>
+                            <span>MAIN TANPA KAMERA</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. SKRIN PERMAINAN (AKTIF) -->
+        <div id="gameScreen" class="w-full flex-col space-y-6 hidden">
+            <!-- Top Status Bar -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-slate-900/80 border border-purple-500/30 px-4 py-3 rounded-2xl flex items-center justify-between shadow-lg backdrop-blur-md">
+                    <span class="text-xs text-purple-300 font-medium">Soalan</span>
+                    <span id="questionCounter" class="text-lg font-bold text-amber-400">1 / 20</span>
+                </div>
+                <div class="bg-slate-900/80 border border-purple-500/30 px-4 py-3 rounded-2xl flex items-center justify-between shadow-lg backdrop-blur-md">
+                    <span class="text-xs text-purple-300 font-medium">Markah</span>
+                    <span id="scoreDisplay" class="text-lg font-bold text-emerald-400">0</span>
+                </div>
+                <div class="bg-slate-900/80 border border-purple-500/30 px-4 py-3 rounded-2xl flex items-center justify-between shadow-lg backdrop-blur-md">
+                    <span class="text-xs text-purple-300 font-medium">Pemasa</span>
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-regular fa-clock text-amber-400"></i>
+                        <span id="timerDisplay" class="text-lg font-bold text-amber-400">10s</span>
+                    </div>
+                </div>
+                <div class="bg-slate-900/80 border border-purple-500/30 px-4 py-3 rounded-2xl flex items-center justify-between shadow-lg backdrop-blur-md">
+                    <span class="text-xs text-purple-300 font-medium">Mod Tangan</span>
+                    <span id="cameraStatusIndicator" class="text-xs font-semibold text-rose-400 bg-rose-950/60 px-2.5 py-1 rounded-full border border-rose-500/30">Tutup</span>
+                </div>
+            </div>
+
+            <!-- Timer Progress Bar -->
+            <div class="w-full bg-slate-900/80 rounded-full h-3 p-0.5 border border-purple-500/30 overflowwnież">
+                <div id="timerBar" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-1000 w-full"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-slate-900/90 border border-purple-500/30 p-6 md:p-8 rounded-3xl shadow-2xl backdrop-blur-xl relative overflow-hidden flex flex-col items-center text-center">
+                <div class="absolute top-0 right-0 transform translate-x-4 -translate-y-4 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <span id="chapterBadge" class="px-4 py-1.5 rounded-full bg-purple-950/80 border border-purple-500/40 text-purple-300 text-xs font-semibold mb-4 shadow-sm">BAB 1: KEDATANGAN KUASA BARAT</span>
+                <h3 id="questionText" class="text-lg md:text-2xl font-bold text-white leading-snug max-w-3xl">Apakah tarikan utama Tanah Melayu kepada kuasa Barat?</h3>
+            </div>
+
+            <!-- Mystery Boxes Grid (A, B, C, D) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                <!-- Box A -->
+                <div onclick="selectAnswer('A')" id="boxA" class="mystery-box bg-gradient-to-br from-violet-900/80 to-indigo-950/90 border-2 border-violet-500/40 hover:border-amber-400 p-5 md:p-6 rounded-3xl shadow-xl cursor-pointer flex items-center space-x-4 relative group">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg group-hover:scale-110 transition shrink-0">
+                        A
+                    </div>
+                    <div class="flex-1 text-left">
+                        <span class="text-xs text-violet-300 font-semibold block mb-1">Kotak Misteri A</span>
+                        <p id="optionTextA" class="text-sm md:text-base font-semibold text-slate-100">Industri pelancongan</p>
+                    </div>
+                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition text-amber-400">
+                        <i class="fa-solid fa-gift text-2xl animate-bounce"></i>
+                    </div>
+                </div>
+
+                <!-- Box B -->
+                <div onclick="selectAnswer('B')" id="boxB" class="mystery-box bg-gradient-to-br from-purple-900/80 to-fuchsia-950/90 border-2 border-purple-500/40 hover:border-amber-400 p-5 md:p-6 rounded-3xl shadow-xl cursor-pointer flex items-center space-x-4 relative group">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg group-hover:scale-110 transition shrink-0">
+                        B
+                    </div>
+                    <div class="flex-1 text-left">
+                        <span class="text-xs text-purple-300 font-semibold block mb-1">Kotak Misteri B</span>
+                        <p id="optionTextB" class="text-sm md:text-base font-semibold text-slate-100">Kekayaan hasil bumi</p>
+                    </div>
+                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition text-amber-400">
+                        <i class="fa-solid fa-gift text-2xl animate-bounce"></i>
+                    </div>
+                </div>
+
+                <!-- Box C -->
+                <div onclick="selectAnswer('C')" id="boxC" class="mystery-box bg-gradient-to-br from-blue-900/80 to-cyan-950/90 border-2 border-blue-500/40 hover:border-amber-400 p-5 md:p-6 rounded-3xl shadow-xl cursor-pointer flex items-center space-x-4 relative group">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg group-hover:scale-110 transition shrink-0">
+                        C
+                    </div>
+                    <div class="flex-1 text-left">
+                        <span class="text-xs text-blue-300 font-semibold block mb-1">Kotak Misteri C</span>
+                        <p id="optionTextC" class="text-sm md:text-base font-semibold text-slate-100">Industri perfileman</p>
+                    </div>
+                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition text-amber-400">
+                        <i class="fa-solid fa-gift text-2xl animate-bounce"></i>
+                    </div>
+                </div>
+
+                <!-- Box D -->
+                <div onclick="selectAnswer('D')" id="boxD" class="mystery-box bg-gradient-to-br from-emerald-900/80 to-teal-950/90 border-2 border-emerald-500/40 hover:border-amber-400 p-5 md:p-6 rounded-3xl shadow-xl cursor-pointer flex items-center space-x-4 relative group">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg group-hover:scale-110 transition shrink-0">
+                        D
+                    </div>
+                    <div class="flex-1 text-left">
+                        <span class="text-xs text-emerald-300 font-semibold block mb-1">Kotak Misteri D</span>
+                        <p id="optionTextD" class="text-sm md:text-base font-semibold text-slate-100">Teknologi moden</p>
+                    </div>
+                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition text-amber-400">
+                        <i class="fa-solid fa-gift text-2xl animate-bounce"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Modal / Banner inside game -->
+            <div id="feedbackBanner" class="hidden bg-slate-900/95 border-2 p-6 rounded-3xl shadow-2xl backdrop-blur-xl flex flex-col items-center text-center animate-fade-in">
+                <div id="feedbackIconContainer" class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-lg"></div>
+                <h4 id="feedbackTitle" class="text-xl font-bold mb-2"></h4>
+                <p id="feedbackDesc" class="text-sm md:text-base text-slate-300 mb-6"></p>
+                <button onclick="nextQuestion()" class="py-3 px-8 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold shadow-lg shadow-amber-500/20 transition transform hover:-translate-y-0.5">
+                    SOALAN SETERUSNYA <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. SKRIN PENAMAT -->
+        <div id="resultScreen" class="w-full flex-col items-center text-center space-y-6 hidden">
+            <div class="bg-slate-900/90 border border-purple-500/30 p-8 md:p-10 rounded-3xl shadow-2xl max-w-3xl w-full backdrop-blur-xl flex flex-col items-center relative overflow-hidden">
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center shadow-xl shadow-amber-500/40 mb-4 animate-bounce">
+                    <i class="fa-solid fa-trophy text-slate-950 text-4xl"></i>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white mb-1">TAHNIAH! ULANG KAJI SELESAI</h2>
+                <p id="achievementTitle" class="text-amber-400 font-bold text-lg mb-6">Pakar Sejarah Tingkatan 3</p>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full mb-8">
+                    <div class="bg-purple-950/50 border border-purple-500/20 p-4 rounded-2xl flex flex-col items-center">
+                        <span class="text-xs text-purple-300 mb-1">Jumlah Markah</span>
+                        <span id="resScore" class="text-xl md:text-2xl font-extrabold text-emerald-400">1850 / 2000</span>
+                    </div>
+                    <div class="bg-purple-950/50 border border-purple-500/20 p-4 rounded-2xl flex flex-col items-center">
+                        <span class="text-xs text-purple-300 mb-1">Betul / Salah</span>
+                        <span id="resCorrect" class="text-xl md:text-2xl font-extrabold text-white">18 / 2</span>
+                    </div>
+                    <div class="bg-purple-950/50 border border-purple-500/20 p-4 rounded-2xl flex flex-col items-center">
+                        <span class="text-xs text-purple-300 mb-1">Ketepatan</span>
+                        <span id="resAccuracy" class="text-xl md:text-2xl font-extrabold text-amber-400">90%</span>
+                    </div>
+                    <div class="bg-purple-950/50 border border-purple-500/20 p-4 rounded-2xl flex flex-col items-center">
+                        <span class="text-xs text-purple-300 mb-1">Masa Keseluruhan</span>
+                        <span id="resTime" class="text-xl md:text-2xl font-extrabold text-purple-300">120s</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                    <button onclick="restartGame()" class="py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold text-sm shadow-xl shadow-amber-500/20 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>MAIN SEMULA</span>
+                    </button>
+                    <button onclick="openReviewScreen()" class="py-4 px-6 rounded-2xl bg-purple-700 hover:bg-purple-600 text-white font-extrabold text-sm shadow-xl shadow-purple-900/40 transition flex items-center justify-center space-x-2 border border-purple-400/30">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <span>SEMAK JAWAPAN</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. SKRIN SEMAK JAWAPAN -->
+        <div id="reviewScreen" class="w-full flex-col space-y-6 hidden">
+            <div class="bg-slate-900/90 border border-purple-500/30 p-6 md:p-8 rounded-3xl shadow-2xl max-w-4xl w-full backdrop-blur-xl mx-auto flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-bold text-white">Semakan Jawapan</h2>
+                        <p class="text-xs text-purple-300">Paparan terperinci soalan dan status jawapan anda</p>
+                    </div>
+                    <button onclick="backToResultScreen()" class="py-2.5 px-5 rounded-xl bg-purple-950/80 border border-purple-500/30 text-purple-200 hover:bg-purple-800 transition text-xs font-semibold flex items-center space-x-2">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Kembali</span>
+                    </button>
+                </div>
+
+                <div id="reviewListContainer" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Camera Floating / Modal Container -->
+    <div id="cameraModal" class="fixed bottom-6 right-6 z-50 hidden flex-col items-end bg-slate-950/90 border border-purple-500/40 p-3 rounded-3xl shadow-2xl backdrop-blur-xl">
+        <div class="flex justify-between items-center w-full mb-2 px-2">
+            <span class="text-xs font-semibold text-purple-300 flex items-center space-x-1.5">
+                <i class="fa-solid fa-video text-amber-400"></i>
+                <span>Kamera Tangan Aktif</span>
+            </span>
+            <button onclick="toggleCameraModal()" class="text-slate-400 hover:text-white p-1">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+        <div class="relative w-48 h-36 bg-slate-900 rounded-2xl overflow-hidden border border-purple-500/20">
+            <video id="webcam" class="w-full h-full object-cover transform -scale-x-100" autoplay playsinline muted></video>
+            <canvas id="output_canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+        </div>
+        <p class="text-[10px] text-purple-300/80 mt-2 text-center w-48">Hala jari telunjuk ke kotak selama 1s</p>
+    </div>
+
+    <!-- Virtual Finger Cursor -->
+    <div id="virtualCursor" class="fixed w-8 h-8 rounded-full border-2 border-amber-400 bg-amber-400/30 backdrop-blur-sm pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 hidden items-center justify-center transition-all duration-75">
+        <div class="w-2.5 h-2.5 bg-amber-400 rounded-full animate-ping"></div>
+        <div id="cursorProgress" class="absolute inset-0 rounded-full border-4 border-amber-500 border-t-transparent animate-spin hidden"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full py-4 text-center text-xs text-purple-400/80 bg-slate-950/40 border-t border-purple-500/20 z-20">
+        &copy; 2026 Kotak Misteri Sejarah Tingkatan 3. Hak Cipta Terpelihara.
+    </footer>
+
+    <!-- JavaScript Game Logic -->
+    <script>
+        // Official 20 Questions Bank
+        const questionsData = [
+            { id: 1, chapter: "BAB 1: KEDATANGAN KUASA BARAT", q: "Apakah tarikan utama Tanah Melayu kepada kuasa Barat?", options: { A: "Industri pelancongan", B: "Kekayaan hasil bumi", C: "Industri perfileman", D: "Teknologi moden" }, correct: "B" },
+            { id: 2, chapter: "BAB 1: KEDATANGAN KUASA BARAT", q: "Mengapakah kuasa Barat bersaing mendapatkan tanah jajahan?", options: { A: "Menguasai perdagangan", B: "Menyebarkan sukan", C: "Membina sekolah sahaja", D: "Menghapuskan perdagangan" }, correct: "A" },
+            { id: 3, chapter: "BAB 2: PENTADBIRAN NEGERI-NEGERI SELAT", q: "Negeri manakah yang diperoleh British melalui Francis Light pada tahun 1786?", options: { A: "Melaka", B: "Singapura", C: "Pulau Pinang", D: "Johor" }, correct: "C" },
+            { id: 4, chapter: "BAB 2: PENTADBIRAN NEGERI-NEGERI SELAT", q: "Apakah tujuan British mendapatkan pelabuhan strategik?", options: { A: "Mengembangkan perdagangan", B: "Menghapuskan pertanian", C: "Menutup laluan kapal", D: "Mengurangkan perdagangan" }, correct: "A" },
+            { id: 5, chapter: "BAB 3: PENTADBIRAN NEGERI-NEGERI MELAYU BERSEKUTU", q: "Negeri manakah membentuk NNMB pada tahun 1896?", options: { A: "Perak, Selangor, Negeri Sembilan dan Pahang", B: "Kedah, Perlis, Kelantan dan Terengganu", C: "Johor, Melaka, Kedah dan Perlis", D: "Sabah, Sarawak, Perak dan Pahang" }, correct: "A" },
+            { id: 6, chapter: "BAB 3: PENTADBIRAN NEGERI-NEGERI MELAYU BERSEKUTU", q: "Siapakah yang mengetuai pentadbiran NNMB?", options: { A: "Gabenor", B: "Residen Jeneral", C: "Ketua Anak Negeri", D: "Sultan" }, correct: "B" },
+            { id: 7, chapter: "BAB 4: PENTADBIRAN BRITISH DI NEGERI-NEGERI MELAYU TIDAK BERSEKUTU", q: "Apakah peranan Penasihat British di negeri Melayu?", options: { A: "Menasihati pemerintah negeri", B: "Menjadi ketua agama Islam", C: "Menghapuskan institusi raja", D: "Menguruskan semua kampung" }, correct: "A" },
+            { id: 8, chapter: "BAB 4: PENTADBIRAN BRITISH DI NEGERI-NEGERI MELAYU TIDAK BERSEKUTU", q: "Apakah status Johor selepas menerima perlindungan British pada tahun 1914?", options: { A: "Tanah jajahan Belanda", B: "Negeri di bawah perlindungan British", C: "Wilayah Siam", D: "Negeri dalam NNMB" }, correct: "B" },
+            { id: 9, chapter: "BAB 5: PENTADBIRAN BARAT DI SARAWAK DAN SABAH", q: "Siapakah pengasas pemerintahan Brooke di Sarawak?", options: { A: "James Brooke", B: "Charles Light", C: "Stamford Raffles", D: "Frank Swettenham" }, correct: "A" },
+            { id: 10, chapter: "BAB 5: PENTADBIRAN BARAT DI SARAWAK DAN SABAH", q: "Apakah syarikat yang mentadbir Sabah pada akhir abad ke-19?", options: { A: "Syarikat Hindia Timur Belanda", B: "Syarikat Berpiagam Borneo Utara British", C: "Syarikat Perdagangan Siam", D: "Syarikat Hindia Timur Perancis" }, correct: "B" },
+            { id: 11, chapter: "BAB 6: KESAN PENTADBIRAN BARAT TERHADAP EKONOMI DAN SOSIAL", q: "Apakah tanaman komersial utama di Tanah Melayu?", options: { A: "Getah", B: "Gandum", C: "Barli", D: "Kurma" }, correct: "A" },
+            { id: 12, chapter: "BAB 6: KESAN PENTADBIRAN BARAT TERHADAP EKONOMI DAN SOSIAL", q: "Apakah kesan kemasukan buruh dari luar?", options: { A: "Masyarakat berbilang kaum terbentuk", B: "Semua penduduk berpindah", C: "Institusi beraja dihapuskan", D: "Perdagangan terhenti" }, correct: "A" },
+            { id: 13, chapter: "BAB 6: KESAN PENTADBIRAN BARAT TERHADAP EKONOMI DAN SOSIAL", q: "Apakah ciri utama pendidikan vernakular?", options: { A: "Bahasa pengantar berbeza mengikut sekolah", B: "Semua sekolah menggunakan bahasa yang sama", C: "Semua murid belajar di sekolah Inggeris", D: "Pendidikan hanya untuk golongan bangsawan" }, correct: "A" },
+            { id: 14, chapter: "BAB 7: PENENTANGAN MASYARAKAT TEMPATAN", q: "Siapakah tokoh yang menentang British di Pahang?", options: { A: "Dato’ Bahaman", B: "Rentap", C: "Mat Salleh", D: "Tok Janggut" }, correct: "A" },
+            { id: 15, chapter: "BAB 7: PENENTANGAN MASYARAKAT TEMPATAN", q: "Mengapakah Tok Janggut menentang British?", options: { A: "Pelaksanaan cukai yang membebankan", B: "Pembukaan sekolah baharu", C: "Pembinaan pelabuhan", D: "Perkembangan tanaman getah" }, correct: "A" },
+            { id: 16, chapter: "BAB 7: PENENTANGAN MASYARAKAT TEMPATAN", q: "Siapakah tokoh yang menentang British di Terengganu?", options: { A: "Haji Abdul Rahman Limbong", B: "Dato’ Maharaja Lela", C: "Rentap", D: "Dol Said" }, correct: "A" },
+            { id: 17, chapter: "BAB 7: PENENTANGAN MASYARAKAT TEMPATAN", q: "Mengapakah Rentap menentang James Brooke?", options: { A: "Campur tangan Brooke dalam kehidupan masyarakat Iban", B: "Pembukaan lombong bijih timah", C: "Pengenalan pendidikan vernakular", D: "Pembentukan NNMB" }, correct: "A" },
+            { id: 18, chapter: "BAB 8: KEBIJAKSANAAN RAJA DAN PEMBESAR MELAYU", q: "Apakah strategi British untuk menguasai negeri Melayu?", options: { A: "Memeterai perjanjian dengan pemerintah", B: "Menyerahkan kuasa kepada rakyat", C: "Menghentikan perdagangan", D: "Menutup semua pelabuhan" }, correct: "A" },
+            { id: 19, chapter: "BAB 8: KEBIJAKSANAAN RAJA DAN PEMBESAR MELAYU", q: "Perjanjian Bangkok 1909 melibatkan British dengan kuasa manakah?", options: { A: "Belanda", B: "Siam", C: "Perancis", D: "Portugis" }, correct: "B" },
+            { id: 20, chapter: "BAB 8: KEBIJAKSANAAN RAJA DAN PEMBESAR MELAYU", q: "Negeri manakah diserahkan hak naungannya kepada British melalui Perjanjian Bangkok 1909?", options: { A: "Perak dan Selangor", B: "Johor dan Melaka", C: "Kedah dan Kelantan", D: "Sabah dan Sarawak" }, correct: "C" }
+        ];
+
+        // Game State Variables
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let unansweredCount = 0;
+        let timerSeconds = 10;
+        let timerInterval = null;
+        let startTime = 0;
+        let totalGameTime = 0;
+        let userAnswersHistory = [];
+        let isAnswerLocked = false;
+        let soundEnabled = true;
+        let cameraActive = false;
+        let handsInstance = null;
+        let cameraInstance = null;
+        let hoverTarget = null;
+        let hoverStartTime = 0;
+        const HOVER_DURATION = 1000; // 1 second
+
+        // Web Audio API Synthesizer Sound Effects
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (!soundEnabled) return;
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            } else if (type === 'incorrect') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            icon.className = soundEnabled ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark";
+        }
+
+        // Start Game
+        function startGame(withCamera) {
+            playSound('click');
+            currentQuestionIndex = 0;
+            score = 0;
+            correctCount = 0;
+            incorrectCount = 0;
+            unansweredCount = 0;
+            userAnswersHistory = [];
+            startTime = Date.now();
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('reviewScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('gameScreen').classList.add('flex');
+
+            if (withCamera && !window.mediaPipeFailed) {
+                initCamera();
+            } else {
+                cameraActive = false;
+                document.getElementById('cameraStatusIndicator').innerText = "Tutup";
+                document.getElementById('cameraStatusIndicator').className = "text-xs font-semibold text-rose-400 bg-rose-950/60 px-2.5 py-1 rounded-full border border-rose-500/30";
+                document.getElementById('cameraModal').classList.add('hidden');
+            }
+
+            loadQuestion();
+        }
+
+        // Load Question
+        function loadQuestion() {
+            if (currentQuestionIndex >= questionsData.length) {
+                endGame();
+                return;
+            }
+
+            isAnswerLocked = false;
+            const q = questionsData[currentQuestionIndex];
+            
+            document.getElementById('questionCounter').innerText = `${currentQuestionIndex + 1} / 20`;
+            document.getElementById('scoreDisplay').innerText = score;
+            document.getElementById('chapterBadge').innerText = q.chapter;
+            document.getElementById('questionText').innerText = q.q;
+
+            document.getElementById('optionTextA').innerText = q.options.A;
+            document.getElementById('optionTextB').innerText = q.options.B;
+            document.getElementById('optionTextC').innerText = q.options.C;
+            document.getElementById('optionTextD').innerText = q.options.D;
+
+            // Reset box styles
+            ['A', 'B', 'C', 'D'].forEach(opt => {
+                const box = document.getElementById(`box${opt}`);
+                box.className = box.className.replace(/border-emerald-500|border-rose-500|bg-emerald-950\/80|bg-rose-950\/80/g, '');
+                box.style.pointerEvents = 'auto';
+            });
+
+            document.getElementById('feedbackBanner').classList.add('hidden');
+
+            // Start Timer
+            timerSeconds = 10;
+            document.getElementById('timerDisplay').innerText = `${timerSeconds}s`;
+            const timerBar = document.getElementById('timerBar');
+            timerBar.style.width = '100%';
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                document.getElementById('timerDisplay').innerText = `${timerSeconds}s`;
+                timerBar.style.width = `${(timerSeconds / 10) * 100}%`;
+
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        // Select Answer
+        function selectAnswer(selectedOption) {
+            if (isAnswerLocked) return;
+            isAnswerLocked = true;
+            clearInterval(timerInterval);
+
+            const q = questionsData[currentQuestionIndex];
+            const isCorrect = (selectedOption === q.correct);
+            let timeTaken = 10 - timerSeconds;
+            let earnedPoints = 0;
+            let bonusPoints = 0;
+
+            ['A', 'B', 'C', 'D'].forEach(opt => {
+                document.getElementById(`box${opt}`).style.pointerEvents = 'none';
+            });
+
+            if (isCorrect) {
+                correctCount++;
+                playSound('correct');
+                earnedPoints = 100;
+                if (timeTaken <= 5) {
+                    bonusPoints = 50;
+                    earnedPoints += 50;
+                }
+                score += earnedPoints;
+                document.getElementById('scoreDisplay').innerText = score;
+
+                const box = document.getElementById(`box${selectedOption}`);
+                box.classList.add('border-emerald-500', 'bg-emerald-950/80');
+
+                showFeedback(true, `BETUL! +${earnedPoints} Markah`, timeTaken <= 5 ? `Hebat! Anda jawab dalam masa ${timeTaken}s (Bonus +50 Markah).` : `Tahniah, jawapan anda tepat.`);
+            } else {
+                incorrectCount++;
+                playSound('incorrect');
+                const box = document.getElementById(`box${selectedOption}`);
+                box.classList.add('border-rose-500', 'bg-rose-950/80');
+
+                const correctBox = document.getElementById(`box${q.correct}`);
+                correctBox.classList.add('border-emerald-500', 'bg-emerald-950/80');
+
+                showFeedback(false, `SALAH! Jawapan Betul: ${q.correct}`, `Pilihan anda: ${selectedOption}. Jawapan sebenar ialah ${q.correct}: ${q.options[q.correct]}`);
+            }
+
+            userAnswersHistory.push({
+                questionNum: currentQuestionIndex + 1,
+                questionText: q.q,
+                chapter: q.chapter,
+                options: q.options,
+                userAnswer: selectedOption,
+                correctAnswer: q.correct,
+                isCorrect: isCorrect,
+                status: 'answered'
+            });
+        }
+
+        // Handle Time Out
+        function handleTimeOut() {
+            if (isAnswerLocked) return;
+            isAnswerLocked = true;
+            unansweredCount++;
+            playSound('incorrect');
+
+            const q = questionsData[currentQuestionIndex];
+            const correctBox = document.getElementById(`box${q.correct}`);
+            correctBox.classList.add('border-emerald-500', 'bg-emerald-950/80');
+
+            ['A', 'B', 'C', 'D'].forEach(opt => {
+                document.getElementById(`box${opt}`).style.pointerEvents = 'none';
+            });
+
+            showFeedback(false, `MASA TAMAT!`, `Tiada jawapan dipilih. Jawapan betul ialah ${q.correct}: ${q.options[q.correct]}`);
+
+            userAnswersHistory.push({
+                questionNum: currentQuestionIndex + 1,
+                questionText: q.q,
+                chapter: q.chapter,
+                options: q.options,
+                userAnswer: '-',
+                correctAnswer: q.correct,
+                isCorrect: false,
+                status: 'unanswered'
+            });
+        }
+
+        // Show Feedback Banner
+        function showFeedback(isCorrect, title, desc) {
+            const banner = document.getElementById('feedbackBanner');
+            const iconContainer = document.getElementById('feedbackIconContainer');
+            const titleEl = document.getElementById('feedbackTitle');
+            const descEl = document.getElementById('feedbackDesc');
+
+            banner.className = `bg-slate-900/95 border-2 ${isCorrect ? 'border-emerald-500/60' : 'border-rose-500/60'} p-6 rounded-3xl shadow-2xl backdrop-blur-xl flex flex-col items-center text-center animate-fade-in`;
+            iconContainer.className = `w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-lg ${isCorrect ? 'bg-emerald-500 text-slate-950' : 'bg-rose-500 text-white'}`;
+            iconContainer.innerHTML = isCorrect ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
+
+            titleEl.className = `text-xl font-bold mb-2 ${isCorrect ? 'text-emerald-400' : 'text-rose-400'}`;
+            titleEl.innerText = title;
+            descEl.innerText = desc;
+
+            banner.classList.remove('hidden');
+        }
+
+        // Next Question
+        function nextQuestion() {
+            playSound('click');
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        // End Game
+        function endGame() {
+            clearInterval(timerInterval);
+            if (cameraActive && cameraInstance) {
+                cameraInstance.stop();
+            }
+            document.getElementById('cameraModal').classList.add('hidden');
+            document.getElementById('virtualCursor').classList.add('hidden');
+
+            totalGameTime = Math.floor((Date.now() - startTime) / 1000);
+            const accuracy = Math.round((correctCount / 20) * 100);
+
+            document.getElementById('gameScreen').classList.remove('flex');
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+            document.getElementById('resultScreen').classList.add('flex');
+
+            document.getElementById('resScore').innerText = `${score} / 2000`;
+            document.getElementById('resCorrect').innerText = `${correctCount} / ${incorrectCount + unansweredCount}`;
+            document.getElementById('resAccuracy').innerText = `${accuracy}%`;
+            document.getElementById('resTime',).innerText = `${totalGameTime}s`;
+
+            let achievement = "Pakar Sejarah Tingkatan 3";
+            if (score >= 1800) achievement = "Masteri Sejarah Cemerlang (A+)";
+            else if (score >= 1400) achievement = "Pelajar Sejarah Dedikasi (A/B)";
+            else if (score >= 1000) achievement = "Pencapaian Memuaskan (C)";
+            else achievement = "Perlukan Lebih Ulang Kaji";
+
+            document.getElementById('achievementTitle').innerText = achievement;
+        }
+
+        // Restart Game
+        function restartGame() {
+            playSound('click');
+            document.getElementById('resultScreen').classList.remove('flex');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+        }
+
+        // Review Screen
+        function openReviewScreen() {
+            playSound('click');
+            document.getElementById('resultScreen').classList.remove('flex');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('reviewScreen').classList.remove('hidden');
+            document.getElementById('reviewScreen').classList.add('flex');
+
+            const container = document.getElementById('reviewListContainer');
+            container.innerHTML = '';
+
+            userAnswersHistory.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = `p-5 rounded-2xl border ${item.isCorrect ? 'bg-emerald-950/20 border-emerald-500/30' : 'bg-rose-950/20 border-rose-500/30'} flex flex-col space-y-2`;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-semibold text-purple-300">Soalan ${item.questionNum} (${item.chapter})</span>
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-full ${item.isCorrect ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}">
+                            ${item.isCorrect ? 'Betul' : (item.status === 'unanswered' ? 'Tidak Dijawab' : 'Salah')}
+                        </span>
+                    </div>
+                    <p class="text-sm font-bold text-white">${item.questionText}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs mt-2">
+                        <div class="p-2.5 rounded-xl bg-slate-900/60 border border-purple-500/20">
+                            <span class="text-purple-300 block mb-0.5">Jawapan Anda:</span>
+                            <span class="font-bold ${item.isCorrect ? 'text-emerald-400' : 'text-rose-400'}">${item.userAnswer} ${item.userAnswer !== '-' ? '- ' + item.options[item.userAnswer] : '(Tiada)'}</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-slate-900/60 border border-purple-500/20">
+                            <span class="text-purple-300 block mb-0.5">Jawapan Betul:</span>
+                            <span class="font-bold text-emerald-400">${item.correctAnswer} - ${item.options[item.correctAnswer]}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function backToResultScreen() {
+            playSound('click');
+            document.getElementById('reviewScreen').classList.remove('flex');
+            document.getElementById('reviewScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('flex');
+            document.getElementById('resultScreen').classList.add('flex');
+        }
+
+        // Camera & MediaPipe Hands Integration
+        function toggleCameraModal() {
+            if (cameraActive) {
+                stopCamera();
+            } else {
+                initCamera();
+            }
+        }
+
+        function initCamera() {
+            if (window.mediaPipeFailed || typeof Hands === 'undefined') {
+                alert("Modul kamera tangan tidak tersedia. Permainan terus berjalan lancar tanpa kamera.");
+                return;
+            }
+
+            const videoElement = document.getElementById('webcam');
+            const canvasElement = document.getElementById('output_canvas');
+            const canvasCtx = canvasElement.getContext('2d');
+
+            handsInstance = new Hands({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            });
+
+            handsInstance.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.6,
+                minTrackingConfidence: 0.6
+            });
+
+            handsInstance.onResults(onHandResults);
+
+            cameraInstance = new Camera(videoElement, {
+                onFrame: async () => {
+                    if (cameraActive) {
+                        await handsInstance.send({ image: videoElement });
+                    }
+                },
+                width: 320,
+                height: 240
+            });
+
+            cameraInstance.start().then(() => {
+                cameraActive = true;
+                document.getElementById('cameraStatusIndicator').innerText = "Aktif";
+                document.getElementById('cameraStatusIndicator').className = "text-xs font-semibold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-500/30";
+                document.getElementById('camHeaderStatus').innerText = "Kamera Aktif";
+                document.getElementById('cameraModal').classList.remove('hidden');
+                document.getElementById('cameraModal').classList.add('flex');
+                document.getElementById('virtualCursor').classList.remove('hidden');
+                document.getElementById('virtualCursor').classList.add('flex');
+            }).catch(err => {
+                console.warn("Camera access failed:", err);
+                cameraActive = false;
+                document.getElementById('cameraStatusIndicator').innerText = "Tutup";
+                document.getElementById('cameraStatusIndicator').className = "text-xs font-semibold text-rose-400 bg-rose-950/60 px-2.5 py-1 rounded-full border border-rose-500/30";
+            });
+        }
+
+        function stopCamera() {
+            cameraActive = false;
+            if (cameraInstance) {
+                cameraInstance.stop();
+            }
+            document.getElementById('cameraModal').classList.add('hidden');
+            document.getElementById('virtualCursor').classList.add('hidden');
+            document.getElementById('cameraStatusIndicator').innerText = "Tutup";
+            document.getElementById('cameraStatusIndicator').className = "text-xs font-semibold text-rose-400 bg-rose-950/60 px-2.5 py-1 rounded-full border border-rose-500/30";
+            document.getElementById('camHeaderStatus').innerText = "Kamera Tangan";
+        }
+
+        function onHandResults(results) {
+            const cursor = document.getElementById('virtualCursor');
+            const progress = document.getElementById('cursorProgress');
+
+            if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+                cursor.style.opacity = '0.4';
+                progress.classList.add('hidden');
+                hoverTarget = null;
+                return;
+            }
+
+            cursor.style.opacity = '1';
+            const indexFinger = results.multiHandLandmarks[0][8]; // Index finger tip
+            // Flip x coordinate because video is mirrored
+            const screenX = (1 - indexFinger.x) * window.innerWidth;
+            const screenY = indexFinger.y * window.innerHeight;
+
+            cursor.style.left = `${screenX}px`;
+            cursor.style.top = `${screenY}px`;
+
+            // Check collision with answer boxes A, B, C, D
+            let currentHoveredBox = null;
+            ['A', 'B', 'C', 'D'].forEach(opt => {
+                const boxEl = document.getElementById(`box${opt}`);
+                if (boxEl) {
+                    const rect = boxEl.getBoundingClientRect();
+                    if (screenX >= rect.left && screenX <= rect.right && screenY >= rect.top && screenY <= rect.bottom) {
+                        currentHoveredBox = opt;
+                    }
+                }
+            });
+
+            if (currentHoveredBox && !isAnswerLocked) {
+                progress.classList.remove('hidden');
+                if (hoverTarget !== currentHoveredBox) {
+                    hoverTarget = currentHoveredBox;
+                    hoverStartTime = Date.now();
+                } else {
+                    const elapsed = Date.now() - hoverStartTime;
+                    if (elapsed >= HOVER_DURATION) {
+                        progress.classList.add('hidden');
+                        hoverTarget = null;
+                        selectAnswer(currentHoveredBox);
+                    }
+                }
+            } else {
+                progress.classList.add('hidden');
+                hoverTarget = null;
+            }
+        }
+    </script>
+</body>
+</html>
